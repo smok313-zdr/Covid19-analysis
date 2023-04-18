@@ -67,7 +67,6 @@ server <- function(input, output) {
     })
     
     output$Chart2 <- renderChart2({ 
-        #a <- country_wise_latest %>% arrange(desc(Deaths)) %>% slice(1:3)
         b <- worldometer_data %>% filter(Continent != "") %>% group_by(Continent) %>% summarise(TotalCases = sum(TotalCases))
         n1 <- mPlot(TotalCases ~ Continent, data = b, type = "Bar")
         #n1$set(width = 900)
