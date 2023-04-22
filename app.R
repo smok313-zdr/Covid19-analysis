@@ -29,8 +29,8 @@ side <- dashboardSidebar(selectInput('country', 'Country/region', countries),
                          selectInput('continent', 'Continent', continents, selected = "Europe"),br(),p(),
                          br(),p(),
                          div(img(src="covid19disease.jpg")),br(),p("Author:"),
-                         a(href= "https://stackoverflow.com/users/12382064/kaczdr",icon("fa fa-stack-overflow", "fa-2x")),
-                         a(href= "https://linkedin.com/in/kacper-zdrojewski-3b2043245",icon("fa fa-linkedin-square", "fa-2x")),br(),br(),p("Data source:"),
+                         a(href= "https://stackoverflow.com/users/12382064/kaczdr",icon("stack-overflow", "fa-2x")),
+                         a(href= "https://linkedin.com/in/kacper-zdrojewski-3b2043245",icon("linkedin", "fa-2x")),br(),br(),p("Data source:"),
                          div(a(href="https://worldometers.info/coronavirus",img(src="worldometers-fb.jpg"))),br(),
                          div(a(href="https://github.com/CSSEGISandData/COVID-19",img(src="jhu.png")))
 )
@@ -47,8 +47,8 @@ body <- dashboardBody(
             solidHeader = TRUE,collapsible = TRUE,showOutput("Chart2", "morris"))
     ),
     fixedRow(
-        column(width = 4,box(title = "Total Cases by Country", status = "warning",solidHeader = TRUE,showOutput("Chart3", "nvd3"),htmlOutput("other"),width = 12)),
-        column(width = 4,box(title = "Country-specific pandemic statistics", status = "warning",solidHeader = TRUE,showOutput("Chart4", "HighCharts"),width = 12)),
+        column(width = 4,box(title = "Total Cases by Country", status = "warning",solidHeader = TRUE,plotOutput("plot2", height = "1px"),showOutput("Chart3", "nvd3"),htmlOutput("other"),width = 12)),
+        column(width = 4,box(title = "Country-specific pandemic statistics", status = "warning",solidHeader = TRUE,plotOutput("plot1", height = "1px"),showOutput("Chart4", "HighCharts"),width = 12)),
         column(width = 4,box(title = "Map of Covid-19 Total Cases", status = "danger",solidHeader = TRUE,leafletOutput("map"),width = 12))
     )
 )
@@ -76,10 +76,10 @@ server <- function(input, output, session) {
         return(selectedCountry)
     })
     
-    output$Chart2 <- renderChart2({ 
+    output$Chart2 <- renderChart({ 
         b <- worldometer_data %>% filter(Continent != "") %>% group_by(Continent) %>% summarise(TotalCases = sum(TotalCases))
         n1 <- mPlot(TotalCases ~ Continent, data = b, type = "Bar")
-        n1$set(hideHover = "auto") 
+        n1$set(hideHover = "auto", dom = "Chart2") 
         #n1$set(width = 900)
         #n1$params$width <- 900
         return(n1)
@@ -102,10 +102,10 @@ server <- function(input, output, session) {
         nn <- nPlot(TotalCases ~ Country.Region, group = "Continent", data = continentData(), type = "multiBarHorizontalChart")
         nn$chart(
             color=c("grey","blue"),
-            margin=list(left=150),
-            showControls=FALSE,
-            width = 400
+            margin=list(left=150,right=50),
+            showControls=FALSE
         )
+        nn$set(width = session$clientData$output_plot2_width)
         return(nn)
     })
     
@@ -119,9 +119,7 @@ server <- function(input, output, session) {
     output$Chart4 <- renderChart2({
         dat <- data.frame(key = colnames(countryData())[c(6,8,10)], value = c(countryData()$TotalDeaths,countryData()$TotalRecovered,countryData()$ActiveCases))
         h1 <- hPlot(x = "key", y = "value", data = dat, type = "pie", title = countryData()$Country.Region)
-        h1$chart(
-            width = 450
-        )
+        h1$set(width = session$clientData$output_plot1_width)
         return(h1)
     })
     
