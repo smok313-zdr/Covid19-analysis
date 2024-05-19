@@ -1,7 +1,7 @@
 # Covid19-analysis
 A shiny app using interactive graphs showing analysis of the Covid-19 pandemic on a global scale. 
 
-Libraries used: shiny, shinydashboard, rCharts, dygraphs, dplyr, leaflet.
+Libraries used: `shiny`, `shinydashboard`, `rCharts`, `dygraphs`, `dplyr`, `leaflet`.
 
 Data source: https://www.kaggle.com/datasets/imdevskp/corona-virus-report?resource=download&select=worldometer_data.csv 
 
